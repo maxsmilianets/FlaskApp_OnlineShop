@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <title>Gobby</title>
+</head>
+
+<body class="shop-body">
+  <header class="shop-topbar">
+    <div class="shop-logo" aria-label="Gobby">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Gobby logo">
+    </div>
+
+    <div class="shop-search" style="justify-content:center; max-width: 520px;">
+      <strong style="font-size:18px;">Nowości w sklepie</strong>
+    </div>
+
+    <div class="shop-actions" style="gap:10px;">
+      {% if session.get('user_id') %}
+        <a class="shop-icon-btn" href="{{ url_for('catalog') }}" title="Katalog" aria-label="Katalog">☰</a>
+        <a class="shop-icon-btn" href="{{ url_for('logout') }}" title="Wyloguj" aria-label="Wyloguj">⎋</a>
+      {% else %}
+        <a class="shop-icon-btn" href="{{ url_for('home') }}" title="Logowanie" aria-label="Logowanie">⇦</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="news-main">
+    <section class="news-hero">
+      <h1 class="news-title">Wiadomości o nowych produktach</h1>
+    </section>
+
+    <section class="news-grid" aria-label="Lista nowości">
+      {% for p in products %}
+        <article class="news-card">
+          <div class="news-card-top">
+            <span class="news-badge">NOWOŚĆ</span>
+            <span class="news-price">{{ p.price_pln() }} zł</span>
+          </div>
+
+          <div class="news-name" title="{{ p.name }}">{{ p.name }}</div>
+
+          {% set img = p.image_url %}
+{% if img %}
+  {% if img.startswith('/static/') %}
+    {% set img_src = img %}
+  {% elif img.startswith('static/') %}
+    {% set img_src = url_for('static', filename=img[7:]) %}
+  {% elif img.startswith('http://') or img.startswith('https://') %}
+    {% set img_src = img %}
+  {% else %}
+    {% set img_src = url_for('static', filename=img) %}
+  {% endif %}
+{% else %}
+  {% set img_src = None %}
+{% endif %}
+
+<div class="news-tile">
+  {% if img_src %}
+    <img class="news-product-img" src="{{ img_src }}" alt="{{ p.name }}">
+  {% else %}
+    <div class="news-tile-fallback">Brak zdjęcia</div>
+  {% endif %}
+</div>
+
+
+          <div class="news-card-actions">
+            {% if session.get('user_id') %}
+              <a class="news-btn" href="{{ url_for('catalog') }}">Zobacz w katalogu</a>
+            {% else %}
+              <a class="news-btn" href="{{ url_for('home') }}">Zaloguj się</a>
+            {% endif %}
+          </div>
+        </article>
+      {% else %}
+        <p>Brak nowości.</p>
+      {% endfor %}
+    </section>
+  </main>
+
+  <footer class="shop-footer" aria-label="Social media">
+    <div class="shop-social">
+      <span class="shop-social-icon">TikTok</span>
+      <span class="shop-social-icon">YouTube</span>
+      <span class="shop-social-icon">Facebook</span>
+      <span class="shop-social-icon">Instagram</span>
+    </div>
+  </footer>
+</body>
+</html>

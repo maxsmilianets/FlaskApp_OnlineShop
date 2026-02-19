@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+  <title>Gobby</title>
+</head>
+
+<body class="shop-body">
+  <header class="shop-topbar">
+    <div class="shop-left">
+      <a class="shop-logo-link" href="{{ url_for('catalog') }}" aria-label="Katalog">
+        <div class="shop-logo">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="logo">
+        </div>
+      </a>
+    </div>
+
+    <div class="shop-search" style="justify-content:center; max-width:520px;">
+      <strong style="font-size:18px;">Profil użytkownika</strong>
+    </div>
+
+    <div class="shop-right">
+      <a class="shop-icon-btn" href="{{ url_for('logout') }}" aria-label="Wyloguj" title="Wyloguj">
+        <img class="shop-icon" src="{{ url_for('static', filename='exit.png') }}" alt="">
+      </a>
+    </div>
+  </header>
+
+  <main class="profile-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="profile-flash">
+          {% for category, message in messages %}
+            <div class="profile-alert profile-alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="profile-card">
+      <h1 class="profile-title">Edytuj dane</h1>
+      <p class="profile-subtitle">Zmień swoje dane profilowe</p>
+
+      <form method="post" class="profile-form">
+        <input class="profile-input" type="text" name="first_name" value="{{ user.first_name }}" placeholder="Imię" required>
+        <input class="profile-input" type="text" name="last_name" value="{{ user.last_name }}" placeholder="Nazwisko" required>
+        <input class="profile-input" type="text" name="username" value="{{ user.username }}" placeholder="Login" required>
+        <input class="profile-input" type="email" name="email" value="{{ user.email }}" placeholder="E-mail" required>
+
+        <div class="profile-divider"></div>
+
+        <input class="profile-input" type="password" name="new_password" placeholder="Nowe hasło (opcjonalnie)">
+        <input class="profile-input" type="password" name="new_password2" placeholder="Powtórz nowe hasło">
+
+        <div class="profile-actions">
+          <button class="profile-btn" type="submit">Zapisz</button>
+          <a class="profile-btn is-secondary" href="{{ url_for('catalog') }}">Wróć do katalogu</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

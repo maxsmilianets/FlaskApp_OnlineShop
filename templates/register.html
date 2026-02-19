@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <title>Gobby</title>
+</head>
+<body class="register-body">
+  <main class="register-wrap">
+
+    <!-- FLASH -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="position:absolute; top:18px; right:18px; width:min(520px, 92vw);">
+          {% for category, message in messages %}
+            <div style="background:#fff; border:3px solid #111; padding:10px 12px; margin-bottom:10px; border-radius:12px;">
+              <strong>{{ category|upper }}</strong>: {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <header class="register-header">
+      <div class="logo" aria-label="Gobby">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Gobby logo">
+      </div>
+      <div class="title">Online Shop</div>
+    </header>
+
+
+    <form class="register-form" method="post" aria-label="Rejestracja">
+      <input class="register-input" type="text" name="first_name" placeholder="Imię" required>
+      <input class="register-input" type="text" name="last_name" placeholder="Nazwisko" required>
+      <input class="register-input" type="text" name="username" placeholder="Login" required>
+      <input class="register-input" type="email" name="email" placeholder="E-mail" required>
+
+      <div class="register-field register-password">
+        <input class="register-input" type="password" name="password" placeholder="Hasło" required>
+        <span class="register-hint">Hasło musi zawierać: min. 8 znaków</span>
+      </div>
+
+      <aside class="register-actions">
+        <button class="register-btn" type="submit">Załóż konto</button>
+
+        <a class="register-back" href="{{ url_for('home') }}" aria-label="Wróć">
+        <img class="register-back-icon" src="{{ url_for('static', filename='btn_back.png') }}" alt="">
+        Wróć  
+        </a>
+      </aside>
+    </form>
+
+  </main>
+</body>
+</html>

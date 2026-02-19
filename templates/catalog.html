@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
+  <title>Gobby</title>
+</head>
+
+<body class="shop-body">
+  <header class="shop-topbar">
+    <div class="shop-left">
+
+      <!-- Logo -->
+      <a class="shop-logo-link" href="{{ url_for('catalog') }}" aria-label="Online Shop">
+        <div class="shop-logo">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="logo">
+        </div>
+      </a>
+
+      <!-- Profil -->
+      <a class="shop-icon-btn" href="{{ url_for('profile') }}" aria-label="Profil użytkownika" title="Profil">
+        <img class="shop-icon" src="{{ url_for('static', filename='user.png') }}" alt="">
+      </a>
+
+      <!-- Koszyk (link do /cart) -->
+      <a class="shop-icon-btn" href="{{ url_for('cart') }}" aria-label="Koszyk" title="Koszyk">
+        <img class="shop-icon" src="{{ url_for('static', filename='basket.png') }}" alt="">
+      </a>
+
+    </div>
+
+    <!-- Wyszukiwarka -->
+    <form class="shop-search" role="search" method="get" action="{{ url_for('catalog') }}">
+      <span class="shop-search-icon" aria-hidden="true"></span>
+      <input type="text" name="q" placeholder="Wyszukaj" value="{{ q or '' }}" aria-label="Wyszukaj">
+    </form>
+
+    <div class="shop-right">
+      <!-- Wyloguj -->
+      <a class="shop-icon-btn" href="{{ url_for('logout') }}" aria-label="Wyloguj" title="Wyloguj">
+        <img class="shop-icon" src="{{ url_for('static', filename='exit.png') }}" alt="">
+      </a>
+    </div>
+  </header>
+
+  <main class="shop-main">
+    <section style="margin-bottom:18px;">
+      <strong>Witaj, {{ user.first_name }}!</strong>
+    </section>
+
+
+<script>
+  setTimeout(() => {
+    document.querySelectorAll(".flash-item").forEach(el => el.remove());
+  }, 2500);
+</script>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-wrap">
+      {% for category, message in messages %}
+        <div class="flash-item flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+    <section class="shop-grid" aria-label="Katalog produktów">
+      {% for p in products %}
+        <article class="shop-card {% if loop.index % 3 != 0 %}is-accent{% endif %}">
+
+          {# --- poprawne budowanie ścieżki obrazka --- #}
+          {% set img = p.image_url %}
+          {% if img %}
+            {% if img.startswith('/static/') %}
+              {% set img_src = img %}
+            {% elif img.startswith('static/') %}
+              {% set img_src = url_for('static', filename=img[7:]) %}
+            {% elif img.startswith('http://') or img.startswith('https://') %}
+              {% set img_src = img %}
+            {% else %}
+              {% set img_src = url_for('static', filename=img) %}
+            {% endif %}
+          {% else %}
+            {% set img_src = None %}
+          {% endif %}
+
+          {# --- KLIK W ZDJĘCIE = DODAJ DO KOSZYKA --- #}
+          <form class="shop-add-form" method="post" action="{{ url_for('cart_add', product_id=p.id) }}">
+            <button class="shop-tile-btn" type="submit" title="Dodaj do koszyka">
+              <div class="shop-tile">
+                {% if img_src %}
+                  <img class="shop-product-img" src="{{ img_src }}" alt="{{ p.name }}">
+                {% else %}
+                  <div class="shop-tile-fallback">Brak zdjęcia</div>
+                {% endif %}
+              </div>
+            </button>
+          </form>
+
+          <div class="shop-name" title="{{ p.name }}">
+            {{ p.name }}
+          </div>
+
+          <div class="shop-price">
+            {{ p.price_pln() }} zł
+          </div>
+
+        </article>
+      {% else %}
+        <p>Brak produktów.</p>
+      {% endfor %}
+    </section>
+  </main>
+
+  <footer class="shop-footer" aria-label="Social media">
+    <div class="shop-social">
+      <span class="shop-social-icon">TikTok</span>
+      <span class="shop-social-icon">YouTube</span>
+      <span class="shop-social-icon">Facebook</span>
+      <span class="shop-social-icon">Instagram</span>
+    </div>
+  </footer>
+</body>
+</html>

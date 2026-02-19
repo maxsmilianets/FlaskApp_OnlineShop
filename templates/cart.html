@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+  <title>Gobby</title>
+</head>
+
+<body class="shop-body">
+  <header class="shop-topbar">
+    <div class="shop-left">
+      <a class="shop-logo-link" href="{{ url_for('catalog') }}" aria-label="Katalog">
+        <div class="shop-logo">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="logo">
+        </div>
+      </a>
+    </div>
+
+    <div class="shop-search" style="justify-content:center; max-width:520px;">
+      <strong style="font-size:18px;">Koszyk</strong>
+    </div>
+
+    <div class="shop-right">
+      <a class="shop-icon-btn" href="{{ url_for('logout') }}" aria-label="Wyloguj" title="Wyloguj">
+        <img class="shop-icon" src="{{ url_for('static', filename='exit.png') }}" alt="">
+      </a>
+    </div>
+  </header>
+
+  <main class="cart-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="cart-flash">
+          {% for category, message in messages %}
+            <div class="cart-alert cart-alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% if items %}
+      <section class="cart-list">
+        {% for it in items %}
+          <article class="cart-item">
+            <div class="cart-img">
+              {% if it.image_url %}
+                {% if it.image_url.startswith('/static/') %}
+                  {% set img_src = it.image_url %}
+                {% elif it.image_url.startswith('static/') %}
+                  {% set img_src = url_for('static', filename=it.image_url[7:]) %}
+                {% elif it.image_url.startswith('http://') or it.image_url.startswith('https://') %}
+                  {% set img_src = it.image_url %}
+                {% else %}
+                  {% set img_src = url_for('static', filename=it.image_url) %}
+                {% endif %}
+                <img src="{{ img_src }}" alt="{{ it.name }}">
+              {% else %}
+                <div class="cart-img-fallback">Brak zdjęcia</div>
+              {% endif %}
+            </div>
+
+            <div class="cart-info">
+              <div class="cart-name">{{ it.name }}</div>
+              <div class="cart-meta">
+                <span>Cena: {{ it.price_pln }} zł</span>
+                <span>Ilość: {{ it.qty }}</span>
+              </div>
+
+              <div class="cart-actions">
+                <form method="post" action="{{ url_for('cart_remove_all', product_id=it.id) }}">
+                  <button class="cart-btn is-danger" type="submit">Usuń produkt</button>
+                </form>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </section>
+
+      <section class="cart-summary">
+        <div class="cart-total">
+          <span>Suma:</span>
+          <strong>{{ total_pln }} zł</strong>
+        </div>
+
+        <div class="cart-summary-actions">
+          <form method="post" action="{{ url_for('cart_clear') }}">
+            <button class="cart-btn is-secondary" type="submit">Wyczyść koszyk</button>
+          </form>
+
+          <form method="post" action="{{ url_for('cart_checkout') }}">
+            <button class="cart-btn is-pay" type="submit">Zapłać</button>
+          </form>
+        </div>
+      </section>
+
+    {% else %}
+      <p style="font-weight:700;">Koszyk jest pusty.</p>
+      <a class="cart-btn is-secondary" href="{{ url_for('catalog') }}">Wróć do katalogu</a>
+    {% endif %}
+  </main>
+</body>
+</html>
